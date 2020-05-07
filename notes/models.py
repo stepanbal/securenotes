@@ -16,7 +16,8 @@ class Category(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=250, blank=False)
-    body = models.TextField()
+    body = models.TextField(blank=True)
+    secure_body = models.BinaryField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     rubric = models.ForeignKey(Category, on_delete=models.CASCADE,
