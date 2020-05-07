@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
-from .models import Category
-from .forms import AddCategoryForm
+from .models import Category, Post
+from .forms import AddCategoryForm, AddPostForm
+from .encode import encoding
 
 
 def index(request):
@@ -33,5 +34,29 @@ def category_add(request):
         return render(request, 'notes/add_category.html') #, {'add_form': add_form})
 
 
-# def post_detail(request, post_id):
-#     post =
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    context = {'post': post}
+    return render(request, 'notes/post.html', context)
+
+
+def post_add(request):
+    if request.method == 'POST':
+        add_form = AddPostForm(data=request.POST)
+        if add_form.is_valid():
+            new_post = add_form.save(commit=False)
+            data = request.POST
+            if data.get('is_secret'):
+                new_post.salt, new_post.secure_body = encoding(data['body'], data['password'])
+                new_post.body = ''
+            new_post.author = User.objects.get(pk=1)
+            new_post.save()
+        return render(request, 'notes/add_post.html', {'added': True})
+    else:
+        categories = User.objects.get(pk=1).notes_categories.all()
+        # add_form = AddPostForm()
+        # форма прописана в шаблоне. хочу сделать через form.as_p или как-то иначе,
+        # но чтобы использовался класс формы
+        # но пока не нашел, как использовать при этом красиво бутстрап.
+        # поэтому хардкод в шаблоне. Это мне не нравится.
+        return render(request, 'notes/add_post.html', {'categories': categories}) #, {'add_form': add_form})
