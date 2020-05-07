@@ -7,6 +7,9 @@ class Category(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='notes_categories')
     
+    def __str__(self):
+        return self.name
+    
     class Meta:
         ordering = ('name',)
 
@@ -22,6 +25,9 @@ class Post(models.Model):
                                related_name='notes_posts')
     salt = models.BinaryField(blank=True)
     is_secret = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.title
 
     class Meta:
         ordering = ('-created',)
