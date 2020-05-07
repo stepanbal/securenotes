@@ -8,7 +8,7 @@
     <h6 class="border-bottom border-gray pb-2 mb-0">Your categories</h6>
     {% if categories.count > 10 %}
     <small class="d-block text-right mt-3">
-      <a class="btn btn-success btn-sm" href="#">Add post</a>
+      <a class="btn btn-success btn-sm" href="{% url 'notes:category_add' %}">Add category</a>
     </small>
     {% endif %}
    {% for category in categories %}
@@ -20,7 +20,7 @@
     </div>
    {% endfor %}
     <small class="d-block text-right mt-3">
-      <a class="btn btn-success" href="#">Add category</a>
+      <a class="btn btn-success" href="{% url 'notes:category_add' %}">Add category</a>
     </small>
   </div>
 {% endblock %}

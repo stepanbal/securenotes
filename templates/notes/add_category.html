@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Add category{% endblock %}
+
+{% block content %}
+    {% if added %}
+        <div class="my-3 p-3 bg-white rounded shadow-sm">
+            <h5 class="border-bottom border-gray pb-2 mb-0">Category added.</h5>
+            <small class="d-block text-left mt-3">
+                <a class="btn btn-success btn-sm" href="{% url 'notes:category_add' %}">Add one more</a>&nbsp;&nbsp;
+                <a class="btn btn-primary btn-sm" href="{% url 'notes:index' %}">Return to categories</a>
+             </small>
+
+        </div>
+    {% else %}
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+    <h6 class="border-bottom border-gray pb-2 mb-0">Add category:</h6>
+    <form action="." method="post">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name">
+                </div>
+            </div>
+        </div>
+        {% csrf_token %}
+        <input class="btn btn-success" type="submit" value="Add">
+    </form>
+    </div>
+    {% endif %}
+{% endblock %}
