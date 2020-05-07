@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+  <div class="my-3 p-3 bg-white rounded shadow-sm">
+    <h4 class="border-bottom border-gray pb-2 mb-0">{{ post.title }}</h4>
+      <p class="media-body pb-1 mb-0 small lh-125 border-bottom border-gray"><i>last updated: {{ post.updated }}</i></p>
+    {% if text %}
+        <div class="media text-muted pt-3">
+            <p class="media-body pb-4 mb-0 lh-125 border-bottom border-gray">
+                <strong class="d-block text-gray-dark">{{ text }}</strong>
+            </p>
+        </div>
+    {% else %}
+    <div class="media text-muted pt-3">
+      <p class="media-body pb-4 mb-0 lh-125 border-bottom border-gray">
+        <strong class="d-block text-gray-dark">Post is secret. Please enter password below to read text.</strong>
+      </p>
+    </div>
+      <form action="." method="post">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+                  <div class="form-group">
+                      <label for="password">Password</label>
+                      <input type="password" class="form-control" id="password" placeholder="Password" name="password">
+                  </div>
+            </div>
+          </div>
+          {% csrf_token %}
+          <input class="btn btn-success" type="submit" value="Enter">
+      </form>
+      {% endif %}
+    <small class="d-block text-right mt-3">
+      <a class="btn btn-success" href="#">Edit note</a>
+    </small>
+  </div>
+{% endblock %}

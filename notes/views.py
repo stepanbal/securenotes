@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
 from .models import Category, Post
 from .forms import AddCategoryForm, AddPostForm
-from .encode import encoding
+from .encode import encoding, decoding
 
 
 def index(request):
@@ -37,7 +37,17 @@ def category_add(request):
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     context = {'post': post}
-    return render(request, 'notes/post.html', context)
+    if post.is_secret:
+        template = 'notes/secure_post.html'
+        if request.method == 'POST':
+            password = request.POST['password']
+            salt = bytes(post.salt)
+            token = bytes(post.secure_body)
+            text = decoding(salt=salt, password=password, token=token)
+            context['text'] = text
+    else:
+        template = 'notes/post.html'
+    return render(request, template, context)
 
 
 def post_add(request):

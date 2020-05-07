@@ -25,4 +25,16 @@ def encoding(text, password):
 
     return salt, token
 
-#print((f.decrypt(token).decode('utf-8')))
+
+def decoding(salt, password, token):
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=100000,
+        backend=default_backend()
+    )
+    password = bytes(password, encoding='utf8')
+    key = base64.urlsafe_b64encode(kdf.derive(password))
+    f = Fernet(key)
+    return f.decrypt(token).decode('utf-8')

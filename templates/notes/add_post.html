@@ -19,15 +19,15 @@
             <div class="form-group col-md-6">
                 <div class="form-group">
                     <label for="name">Title</label>
-                    <input type="text" class="form-control" id="name" name="title">
+                    <input type="text" class="form-control" id="name" name="title" required>
                 </div>
                 <div class="form-group">
                     <label for="body">Text</label>
                     <textarea class="form-control" id="body" name="body" rows="3"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="categories">Categories</label>
-                    <select class="form-control" id="categories" name="rubric">
+                    <label for="category">Category</label>
+                    <select class="form-control" id="category" name="rubric">
                       {% for category in categories %}
                       <option value="{{ category.id }}">{{ category.name }}</option>
                       {% endfor %}

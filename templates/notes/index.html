@@ -20,6 +20,7 @@
     </div>
    {% endfor %}
     <small class="d-block text-right mt-3">
+      <a class="btn btn-success" href="{% url 'notes:post_add' %}">Add note</a>&nbsp;&nbsp;
       <a class="btn btn-success" href="{% url 'notes:category_add' %}">Add category</a>
     </small>
   </div>
