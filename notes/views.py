@@ -128,9 +128,10 @@ def secret_post_edit(request, post_id):
         password = request.POST['password']
         salt = bytes(post.salt)
         token = bytes(post.secure_body)
-        post.body = decoding(salt=salt, password=password, token=token)
-        post.salt = bytes('', encoding='utf8')
-        post.secure_body = bytes('', encoding='utf8')
+        text = decoding(salt=salt, password=password, token=token)
+        if text == 'Error. Wrong password':
+            return render(request, 'notes/edit_secret_post.html', {'post': post, 'error': True})
+        post.body = text
         post.is_secret = False
         post.save()
         return HttpResponseRedirect(reverse('notes:post_edit', kwargs={'post_id': post.id}))
