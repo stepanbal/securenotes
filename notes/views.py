@@ -43,6 +43,16 @@ def category_delete(request, cat_id):
     return HttpResponseRedirect(reverse('notes:index'))
 
 
+def category_rename(request, cat_id):
+    category = get_object_or_404(Category, pk=cat_id)
+    if request.method == 'POST':
+        category.name = request.POST['name']
+        category.save()
+        return HttpResponseRedirect(reverse('notes:index'))
+    else:
+        return render(request, 'notes/rename_category.html', {'category': category})
+
+
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     context = {'post': post}

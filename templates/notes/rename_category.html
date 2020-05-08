@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Add note{% endblock %}
+
+{% block content %}
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+    <h6 class="border-bottom border-gray pb-2 mb-0">Rename category "{{ category.name }}":</h6>
+    <form action="." method="post">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <div class="form-group">
+                    <label for="name">New name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="{{ category.name }}" required>
+                </div>
+            </div>
+        </div>
+        {% csrf_token %}
+        <input class="btn btn-success" type="submit" value="Submit">
+    </form>
+    </div>
+{% endblock %}
