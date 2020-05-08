@@ -17,6 +17,7 @@
           <strong class="d-block text-gray-dark">
               <a href="{% url 'notes:post' post.id %}">{{ post.title }}</a>
               <div class="text-right">
+                  <a class="btn btn-outline-primary btn-sm" href="{% url 'notes:post_edit' post.id %}">Edit</a>
                   <a class="btn btn-outline-danger btn-sm" href="{% url 'notes:post_delete' post.id %}">Delete</a>
               </div>
           </strong>

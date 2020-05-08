@@ -12,7 +12,7 @@
       </p>
     </div>
     <small class="d-block text-right mt-3">
-      <a class="btn btn-success btn-sm" href="#">Edit</a>
+      <a class="btn btn-success btn-sm" href="{% url 'notes:post_edit' post.id %}">Edit</a>
       <a class="btn btn-danger btn-sm" href="{% url 'notes:post_delete' post.id %}">Delete</a>
     </small>
   </div>

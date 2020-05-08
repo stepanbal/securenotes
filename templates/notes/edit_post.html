@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Add note{% endblock %}
+
+{% block content %}
+    {% if saved %}
+        <div class="my-3 p-3 bg-white rounded shadow-sm">
+            <h5 class="border-bottom border-gray pb-2 mb-0">Post saved.</h5>
+            <small class="d-block text-left mt-3">
+                <a class="btn btn-primary btn-sm" href="{% url 'notes:category' post.rubric.id %}">Return to category</a>
+             </small>
+        </div>
+    {% else %}
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+    <h6 class="border-bottom border-gray pb-2 mb-0">Add post:</h6>
+    <form action="." method="post">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <div class="form-group">
+                    <label for="name">Title</label>
+                    <input type="text" class="form-control" value="{{ post.title }}" id="name" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="body">Text</label>
+                    <textarea class="form-control" id="body" name="body" rows="3">{{ post.body }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select class="form-control" id="category" name="rubric">
+                      {% for category in categories %}
+                        {% if category == post.rubric %}
+                            <option selected value="{{ category.id }}">{{ category.name }}</option>
+                        {% else %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" {% if post.is_secret %} checked {% endif %} class="form-check-input" id="issecret" name="is_secret">
+                    <label class="form-check-label" for="issecret">Is secret?</label>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Password" name="password">
+                    <small id="passHelp" class="form-text text-muted">Type password if note is secret</small>
+                </div>
+            </div>
+        </div>
+        {% csrf_token %}
+        <input class="btn btn-success" type="submit" value="Add">
+    </form>
+    </div>
+    {% endif %}
+{% endblock %}

@@ -96,3 +96,23 @@ def post_delete(request, post_id):
     cat_id = post.rubric.id
     post.delete()
     return HttpResponseRedirect(reverse('notes:category', kwargs={'cat_id': cat_id}))
+
+
+def post_edit(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if request.method == 'POST':
+        edit_form = AddPostForm(data=request.POST)
+        if edit_form.is_valid():
+            data = request.POST
+            post.title = data.get('title')
+            post.body = data.get('body')
+            if data.get('is_secret'):
+                post.salt, post.secure_body = encoding(data['body'], data['password'])
+                post.body = ''
+                post.is_secret = True
+            post.author = User.objects.get(pk=1)
+            post.save()
+        return render(request, 'notes/edit_post.html', {'post': post, 'saved': True})
+    else:
+        categories = User.objects.get(pk=1).notes_categories.all()
+        return render(request, 'notes/edit_post.html', {'post': post, 'categories': categories})
