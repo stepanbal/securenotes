@@ -34,7 +34,7 @@ def category_add(request):
         # но чтобы использовался класс формы
         # но пока не нашел, как использовать при этом красиво бутстрап.
         # поэтому хардкод в шаблоне. Это мне не нравится.
-        return render(request, 'notes/add_category.html') #, {'add_form': add_form})
+        return render(request, 'notes/add_category.html')  # , {'add_form': add_form})
 
 
 def category_delete(request, cat_id):
@@ -88,7 +88,7 @@ def post_add(request):
         # но чтобы использовался класс формы
         # но пока не нашел, как использовать при этом красиво бутстрап.
         # поэтому хардкод в шаблоне. Это мне не нравится.
-        return render(request, 'notes/add_post.html', {'categories': categories}) #, {'add_form': add_form})
+        return render(request, 'notes/add_post.html', {'categories': categories})  # , {'add_form': add_form})
 
 
 def post_delete(request, post_id):
@@ -100,19 +100,39 @@ def post_delete(request, post_id):
 
 def post_edit(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
-    if request.method == 'POST':
-        edit_form = AddPostForm(data=request.POST)
-        if edit_form.is_valid():
-            data = request.POST
-            post.title = data.get('title')
-            post.body = data.get('body')
-            if data.get('is_secret'):
-                post.salt, post.secure_body = encoding(data['body'], data['password'])
-                post.body = ''
-                post.is_secret = True
-            post.author = User.objects.get(pk=1)
-            post.save()
-        return render(request, 'notes/edit_post.html', {'post': post, 'saved': True})
+    if post.is_secret:
+        return secret_post_edit(request, post.id)
     else:
-        categories = User.objects.get(pk=1).notes_categories.all()
-        return render(request, 'notes/edit_post.html', {'post': post, 'categories': categories})
+        if request.method == 'POST':
+            edit_form = AddPostForm(data=request.POST)
+            if edit_form.is_valid():
+                data = request.POST
+                post.title = data.get('title')
+                post.body = data.get('body')
+                if data.get('is_secret'):
+                    post.salt, post.secure_body = encoding(data['body'], data['password'])
+                    post.body = ''
+                    post.is_secret = True
+                post.author = User.objects.get(pk=1)
+                post.save()
+            return render(request, 'notes/edit_post.html', {'post': post, 'saved': True})
+        else:
+            categories = User.objects.get(pk=1).notes_categories.all()
+            context = {'post': post, 'categories': categories}
+            return render(request, 'notes/edit_post.html', context)
+
+
+def secret_post_edit(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if request.method == 'POST':
+        password = request.POST['password']
+        salt = bytes(post.salt)
+        token = bytes(post.secure_body)
+        post.body = decoding(salt=salt, password=password, token=token)
+        post.salt = bytes('', encoding='utf8')
+        post.secure_body = bytes('', encoding='utf8')
+        post.is_secret = False
+        post.save()
+        return HttpResponseRedirect(reverse('notes:post_edit', kwargs={'post_id': post.id}))
+    else:
+        return render(request, 'notes/edit_secret_post.html', {'post': post})

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Add note{% endblock %}
+{% block title %}Edit note{% endblock %}
 
 {% block content %}
     {% if saved %}
@@ -11,7 +11,7 @@
         </div>
     {% else %}
     <div class="my-3 p-3 bg-white rounded shadow-sm">
-    <h6 class="border-bottom border-gray pb-2 mb-0">Add post:</h6>
+    <h6 class="border-bottom border-gray pb-2 mb-0">Edit post:</h6>
     <form action="." method="post">
         <div class="form-row">
             <div class="form-group col-md-6">
@@ -36,7 +36,7 @@
                     </select>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" {% if post.is_secret %} checked {% endif %} class="form-check-input" id="issecret" name="is_secret">
+                    <input type="checkbox" class="form-check-input" id="issecret" name="is_secret">
                     <label class="form-check-label" for="issecret">Is secret?</label>
                 </div>
                 <div class="form-group">
@@ -47,7 +47,7 @@
             </div>
         </div>
         {% csrf_token %}
-        <input class="btn btn-success" type="submit" value="Edit">
+        <input class="btn btn-success" type="submit" value="Edit" name="edit">
     </form>
     </div>
     {% endif %}
