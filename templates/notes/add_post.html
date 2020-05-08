@@ -7,7 +7,7 @@
             <h5 class="border-bottom border-gray pb-2 mb-0">Post added.</h5>
             <small class="d-block text-left mt-3">
                 <a class="btn btn-success btn-sm" href="{% url 'notes:post_add' %}">Add one more</a>&nbsp;&nbsp;
-                <a class="btn btn-primary btn-sm" href="{% url 'notes:index' %}">Return to categories</a>
+                <a class="btn btn-primary btn-sm" href="{% url 'notes:category' post.rubric.id %}">Return to category</a>
              </small>
 
         </div>

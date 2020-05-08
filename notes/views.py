@@ -80,7 +80,7 @@ def post_add(request):
                 new_post.body = ''
             new_post.author = User.objects.get(pk=1)
             new_post.save()
-        return render(request, 'notes/add_post.html', {'added': True})
+        return render(request, 'notes/add_post.html', {'post': new_post, 'added': True})
     else:
         categories = User.objects.get(pk=1).notes_categories.all()
         # add_form = AddPostForm()
