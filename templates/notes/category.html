@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}{{ category.name }}{% endblock %}
 
 {% block content %}
@@ -17,6 +18,7 @@
           <strong class="d-block text-gray-dark">
               <a href="{% url 'notes:post' post.id %}">{{ post.title }}</a>
               <div class="text-right">
+                  {% if post.is_secret %}<img alt="secret" src="{% static 'image/secret.jpg' %}">{% endif %}
                   <a class="btn btn-outline-primary btn-sm" href="{% url 'notes:post_edit' post.id %}">Edit</a>
                   <a class="btn btn-outline-danger btn-sm" href="{% url 'notes:post_delete' post.id %}">Delete</a>
               </div>
