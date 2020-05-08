@@ -1,5 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 from .models import Category, Post
 from .forms import AddCategoryForm, AddPostForm
 from .encode import encoding, decoding
@@ -70,3 +73,10 @@ def post_add(request):
         # но пока не нашел, как использовать при этом красиво бутстрап.
         # поэтому хардкод в шаблоне. Это мне не нравится.
         return render(request, 'notes/add_post.html', {'categories': categories}) #, {'add_form': add_form})
+
+
+def post_delete(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    cat_id = post.rubric.id
+    post.delete()
+    return HttpResponseRedirect(reverse('notes:category', kwargs={'cat_id': cat_id}))
