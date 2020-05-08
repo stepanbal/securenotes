@@ -17,7 +17,7 @@
       <p class="media-body pb-4 mb-0 small lh-125 border-bottom border-gray">
           <strong class="d-block text-gray-dark"><a href="{% url 'notes:category' category.id %}">{{ category.name }}</a></strong>
           <div class="text-right">
-            <a class="btn btn-danger btn-sm" href="{% url 'notes:category_delete' category.id %}">Delete</a>
+            <a class="btn btn-outline-danger btn-sm" href="{% url 'notes:category_delete' category.id %}">Delete</a>
           </div>
       </p>
     </div>
