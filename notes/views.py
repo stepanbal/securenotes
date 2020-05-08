@@ -37,6 +37,12 @@ def category_add(request):
         return render(request, 'notes/add_category.html') #, {'add_form': add_form})
 
 
+def category_delete(request, cat_id):
+    category = get_object_or_404(Category, pk=cat_id)
+    category.delete()
+    return HttpResponseRedirect(reverse('notes:index'))
+
+
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     context = {'post': post}
