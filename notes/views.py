@@ -11,7 +11,7 @@ from .encode import encoding, decoding
 
 @login_required
 def index(request):
-    categories = Category.objects.all()
+    categories = Category.objects.filter(author=request.user)
     context = {'categories': categories}
     return render(request, 'notes/index.html', context)
 
@@ -29,7 +29,7 @@ def category_add(request):
         add_form = AddCategoryForm(data=request.POST)
         if add_form.is_valid():
             new_category = add_form.save(commit=False)
-            new_category.author = User.objects.get(pk=1)
+            new_category.author = request.user
             new_category.save()
             return render(request, 'notes/add_category.html', {'added': True})
     else:
@@ -86,11 +86,11 @@ def post_add(request):
             if data.get('is_secret'):
                 new_post.salt, new_post.secure_body = encoding(data['body'], data['password'])
                 new_post.body = ''
-            new_post.author = User.objects.get(pk=1)
+            new_post.author = request.user
             new_post.save()
         return render(request, 'notes/add_post.html', {'post': new_post, 'added': True})
     else:
-        categories = User.objects.get(pk=1).notes_categories.all()
+        categories = request.user.notes_categories.all()
         # add_form = AddPostForm()
         # форма прописана в шаблоне. хочу сделать через form.as_p или как-то иначе,
         # но чтобы использовался класс формы
@@ -123,11 +123,11 @@ def post_edit(request, post_id):
                     post.salt, post.secure_body = encoding(data['body'], data['password'])
                     post.body = ''
                     post.is_secret = True
-                post.author = User.objects.get(pk=1)
+                post.author = request.user
                 post.save()
             return render(request, 'notes/edit_post.html', {'post': post, 'saved': True})
         else:
-            categories = User.objects.get(pk=1).notes_categories.all()
+            categories = request.user.notes_categories.all()
             context = {'post': post, 'categories': categories}
             return render(request, 'notes/edit_post.html', context)
 
