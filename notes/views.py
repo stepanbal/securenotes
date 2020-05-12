@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
+from django.contrib.auth import authenticate, login
 
 from .models import Category, Post
-from .forms import AddCategoryForm, AddPostForm
+from .forms import AddCategoryForm, AddPostForm, LoginForm
 from .encode import encoding, decoding
 
 
@@ -137,3 +138,24 @@ def secret_post_edit(request, post_id):
         return HttpResponseRedirect(reverse('notes:post_edit', kwargs={'post_id': post.id}))
     else:
         return render(request, 'notes/edit_secret_post.html', {'post': post})
+
+
+def user_login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user = authenticate(request,
+                                username=cd['username'],
+                                password=cd['password'])
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return HttpResponse('Authenticated successfully')
+            else:
+                return HttpResponse('Disabled account')
+        else:
+            return HttpResponse('Invalid login')
+    else:
+        form = LoginForm()
+    return render(request, 'account/login.html', {'form': form})
