@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Logged out{% endblock %}
+
+{% block content %}
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+        <h4 class="border-bottom border-gray pb-2 mb-0">Logged out</h4>
+        <div class="media text-muted pt-3">
+            <p class="media-body pb-4 mb-0 lh-125 border-bottom border-gray">
+                <strong class="d-block text-gray-dark">You have been successfully logged out.
+                You can <a href="{% url "notes:login" %}">login again</a>.</strong>
+            </p>
+        </div>
+    </div>
+{% endblock %}

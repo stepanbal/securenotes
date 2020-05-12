@@ -3,24 +3,28 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 
 from .models import Category, Post
 from .forms import AddCategoryForm, AddPostForm, LoginForm
 from .encode import encoding, decoding
 
 
+@login_required
 def index(request):
     categories = Category.objects.all()
     context = {'categories': categories}
     return render(request, 'notes/index.html', context)
 
 
+@login_required
 def category_detail(request, cat_id):
     category = get_object_or_404(Category, pk=cat_id)
     context = {'category': category}
     return render(request, 'notes/category.html', context)
 
 
+@login_required
 def category_add(request):
     if request.method == 'POST':
         add_form = AddCategoryForm(data=request.POST)
@@ -38,12 +42,14 @@ def category_add(request):
         return render(request, 'notes/add_category.html')  # , {'add_form': add_form})
 
 
+@login_required
 def category_delete(request, cat_id):
     category = get_object_or_404(Category, pk=cat_id)
     category.delete()
     return HttpResponseRedirect(reverse('notes:index'))
 
 
+@login_required
 def category_rename(request, cat_id):
     category = get_object_or_404(Category, pk=cat_id)
     if request.method == 'POST':
@@ -54,6 +60,7 @@ def category_rename(request, cat_id):
         return render(request, 'notes/rename_category.html', {'category': category})
 
 
+@login_required
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     context = {'post': post}
@@ -70,6 +77,7 @@ def post_detail(request, post_id):
     return render(request, template, context)
 
 
+@login_required
 def post_add(request):
     if request.method == 'POST':
         add_form = AddPostForm(data=request.POST)
@@ -92,6 +100,7 @@ def post_add(request):
         return render(request, 'notes/add_post.html', {'categories': categories})  # , {'add_form': add_form})
 
 
+@login_required
 def post_delete(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     cat_id = post.rubric.id
@@ -99,6 +108,7 @@ def post_delete(request, post_id):
     return HttpResponseRedirect(reverse('notes:category', kwargs={'cat_id': cat_id}))
 
 
+@login_required
 def post_edit(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     if post.is_secret:
@@ -123,6 +133,7 @@ def post_edit(request, post_id):
             return render(request, 'notes/edit_post.html', context)
 
 
+@login_required
 def secret_post_edit(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     if request.method == 'POST':
@@ -138,24 +149,3 @@ def secret_post_edit(request, post_id):
         return HttpResponseRedirect(reverse('notes:post_edit', kwargs={'post_id': post.id}))
     else:
         return render(request, 'notes/edit_secret_post.html', {'post': post})
-
-
-def user_login(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            user = authenticate(request,
-                                username=cd['username'],
-                                password=cd['password'])
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                return HttpResponse('Authenticated successfully')
-            else:
-                return HttpResponse('Disabled account')
-        else:
-            return HttpResponse('Invalid login')
-    else:
-        form = LoginForm()
-    return render(request, 'account/login.html', {'form': form})
