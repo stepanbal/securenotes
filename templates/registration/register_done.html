@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+    <div class="my-3 p-3 bg-white rounded shadow-sm">
+        <h6 class="border-bottom border-gray pb-2 mb-0">Welcome {{ new_user.username }}!</h6>
+        <p>Your account has been successfully created. Now you can <a href="{% url "notes:login" %}">log in</a>.</p>
+    </div>
+{% endblock %}

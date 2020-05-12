@@ -1,12 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
 from .models import Category, Post
-from .forms import AddCategoryForm, AddPostForm, LoginForm
+from .forms import AddCategoryForm, AddPostForm, UserRegistrationForm
 from .encode import encoding, decoding
 
 
@@ -149,3 +148,16 @@ def secret_post_edit(request, post_id):
         return HttpResponseRedirect(reverse('notes:post_edit', kwargs={'post_id': post.id}))
     else:
         return render(request, 'notes/edit_secret_post.html', {'post': post})
+
+
+def register(request):
+    if request.method == 'POST':
+        user_form = UserRegistrationForm(request.POST)
+        if user_form.is_valid():
+            new_user = user_form.save(commit=False)
+            new_user.set_password(user_form.cleaned_data['password'])
+            new_user.save()
+            return render(request, 'registration/register_done.html', {'new_user': new_user})
+    else:
+        user_form = UserRegistrationForm()
+    return render(request, 'registration/register.html', {'user_form': user_form})

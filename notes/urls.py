@@ -22,4 +22,5 @@ urlpatterns = [
          auth_views.PasswordChangeView.as_view(success_url=reverse_lazy('notes:password_change_done')),
          name='password_change'),
     path('password_change/done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done'),
+    path('register/', views.register, name='register'),
 ]
