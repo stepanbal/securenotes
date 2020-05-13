@@ -19,8 +19,11 @@ def index(request):
 @login_required
 def category_detail(request, cat_id):
     category = get_object_or_404(Category, pk=cat_id)
-    context = {'category': category}
-    return render(request, 'notes/category.html', context)
+    if category.author == request.user:
+        context = {'category': category}
+        return render(request, 'notes/category.html', context)
+    else:
+        return HttpResponseRedirect(reverse('notes:alien'))
 
 
 @login_required
@@ -44,6 +47,8 @@ def category_add(request):
 @login_required
 def category_delete(request, cat_id):
     category = get_object_or_404(Category, pk=cat_id)
+    if category.author != request.user:
+        return HttpResponseRedirect(reverse('notes:alien'))
     category.delete()
     return HttpResponseRedirect(reverse('notes:index'))
 
@@ -51,6 +56,8 @@ def category_delete(request, cat_id):
 @login_required
 def category_rename(request, cat_id):
     category = get_object_or_404(Category, pk=cat_id)
+    if category.author != request.user:
+        return HttpResponseRedirect(reverse('notes:alien'))
     if request.method == 'POST':
         category.name = request.POST['name']
         category.save()
@@ -62,6 +69,8 @@ def category_rename(request, cat_id):
 @login_required
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
+    if post.author != request.user:
+        return HttpResponseRedirect(reverse('notes:alien'))
     context = {'post': post}
     if post.is_secret:
         template = 'notes/secure_post.html'
@@ -102,6 +111,8 @@ def post_add(request):
 @login_required
 def post_delete(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
+    if post.author != request.user:
+        return HttpResponseRedirect(reverse('notes:alien'))
     cat_id = post.rubric.id
     post.delete()
     return HttpResponseRedirect(reverse('notes:category', kwargs={'cat_id': cat_id}))
@@ -110,6 +121,8 @@ def post_delete(request, post_id):
 @login_required
 def post_edit(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
+    if post.author != request.user:
+        return HttpResponseRedirect(reverse('notes:alien'))
     if post.is_secret:
         return secret_post_edit(request, post.id)
     else:
@@ -135,6 +148,8 @@ def post_edit(request, post_id):
 @login_required
 def secret_post_edit(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
+    if post.author != request.user:
+        return HttpResponseRedirect(reverse('notes:alien'))
     if request.method == 'POST':
         password = request.POST['password']
         salt = bytes(post.salt)
@@ -148,6 +163,10 @@ def secret_post_edit(request, post_id):
         return HttpResponseRedirect(reverse('notes:post_edit', kwargs={'post_id': post.id}))
     else:
         return render(request, 'notes/edit_secret_post.html', {'post': post})
+
+
+def alien_post(request):
+    return render(request, 'notes/alien.html')
 
 
 def register(request):

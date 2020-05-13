@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}No such note or category{% endblock %}
+
+{% block content %}
+<div class="my-3 p-3 bg-white rounded shadow-sm">
+    <h4 class="border-bottom border-gray pb-2 mb-0">No such note or category</h4>
+     <div class="media text-muted pt-3">
+      <p class="media-body pb-4 mb-0 lh-125 border-bottom border-gray">
+        <strong class="d-block text-gray-dark">Error. Category or note does not exist. Please return to your
+        <a href="{% url 'notes:index' %}">categories list</a></strong>
+      </p>
+    </div>
+  </div>
+{% endblock %}
