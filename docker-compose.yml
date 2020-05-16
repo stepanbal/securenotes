@@ -1,0 +1,31 @@
+version: "2.4"
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:9000
+    volumes:
+        - .:/usr/src/app/
+    container_name: web
+    ports:
+      - 9000:9000
+    depends_on: 
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=notes_user
+      - POSTGRES_PASSWORD=dbpassword
+      - POSTGRES_DB=notes
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
