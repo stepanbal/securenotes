@@ -2,10 +2,10 @@ version: "2.4"
 
 services:
   web:
-    build: .
+    build: ./app
     command: python manage.py runserver 0.0.0.0:9000
     volumes:
-        - .:/usr/src/app/
+        - ./app:/usr/src/app/
     container_name: web
     ports:
       - 9000:9000
@@ -17,6 +17,7 @@ services:
     image: postgres:latest
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    container_name: db
     environment:
       - POSTGRES_USER=notes_user
       - POSTGRES_PASSWORD=dbpassword
