@@ -6,7 +6,7 @@ of the application by different users. In addition, each of them will have their
 ### Dependencies
 - Python 3.8
 - Django 2.2.12
-- cryptogaphy 2.9.2
+- cryptography 2.9.2
 - psycopg2-binary 2.8.5
 
 **Also I used:**
