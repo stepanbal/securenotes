@@ -1,8 +1,9 @@
+from django.db.models import QuerySet
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse, HttpRequest, Http404, QueryDict
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from typing import Union, Dict
 
 from .models import Category, Post
 from .forms import AddCategoryForm, AddPostForm, UserRegistrationForm
@@ -10,28 +11,28 @@ from .encode import encoding, decoding
 
 
 @login_required
-def index(request):
-    categories = Category.objects.filter(author=request.user)
-    context = {'categories': categories}
+def index(request: HttpRequest) -> HttpResponse:
+    categories: QuerySet = Category.objects.filter(author=request.user)
+    context: Dict = {'categories': categories}
     return render(request, 'notes/index.html', context)
 
 
 @login_required
-def category_detail(request, cat_id):
-    category = get_object_or_404(Category, pk=cat_id)
+def category_detail(request: HttpRequest, cat_id: int) -> HttpResponse:
+    category: Union[Category, Http404] = get_object_or_404(Category, pk=cat_id)
     if category.author == request.user:
-        context = {'category': category}
+        context: Dict = {'category': category}
         return render(request, 'notes/category.html', context)
     else:
         return HttpResponseRedirect(reverse('notes:alien'))
 
 
 @login_required
-def category_add(request):
+def category_add(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
-        add_form = AddCategoryForm(data=request.POST)
+        add_form: AddCategoryForm = AddCategoryForm(data=request.POST)
         if add_form.is_valid():
-            new_category = add_form.save(commit=False)
+            new_category: Category = add_form.save(commit=False)
             new_category.author = request.user
             new_category.save()
             return render(request, 'notes/add_category.html', {'added': True})
@@ -45,8 +46,8 @@ def category_add(request):
 
 
 @login_required
-def category_delete(request, cat_id):
-    category = get_object_or_404(Category, pk=cat_id)
+def category_delete(request: HttpRequest, cat_id: int) -> HttpResponseRedirect:
+    category: Union[Category, Http404] = get_object_or_404(Category, pk=cat_id)
     if category.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
     category.delete()
@@ -54,8 +55,8 @@ def category_delete(request, cat_id):
 
 
 @login_required
-def category_rename(request, cat_id):
-    category = get_object_or_404(Category, pk=cat_id)
+def category_rename(request: HttpRequest, cat_id: int) -> Union[HttpResponseRedirect, HttpResponse]:
+    category: Union[Category, Http404] = get_object_or_404(Category, pk=cat_id)
     if category.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
     if request.method == 'POST':
@@ -67,31 +68,31 @@ def category_rename(request, cat_id):
 
 
 @login_required
-def post_detail(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
+def post_detail(request: HttpRequest, post_id: int) -> Union[HttpResponseRedirect, HttpResponse]:
+    post: Union[Post, Http404] = get_object_or_404(Post, pk=post_id)
     if post.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
-    context = {'post': post}
+    context: Dict = {'post': post}
     if post.is_secret:
-        template = 'notes/secure_post.html'
+        template: str = 'notes/secure_post.html'
         if request.method == 'POST':
-            password = request.POST['password']
-            salt = bytes(post.salt)
-            token = bytes(post.secure_body)
-            text = decoding(salt=salt, password=password, token=token)
+            password: str = request.POST['password']
+            salt: bytes = bytes(post.salt)
+            token: bytes = bytes(post.secure_body)
+            text: str = decoding(salt=salt, password=password, token=token)
             context['text'] = text
     else:
-        template = 'notes/post.html'
+        template: str = 'notes/post.html'
     return render(request, template, context)
 
 
 @login_required
-def post_add(request):
+def post_add(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
-        add_form = AddPostForm(data=request.POST)
+        add_form: AddPostForm = AddPostForm(data=request.POST)
         if add_form.is_valid():
-            new_post = add_form.save(commit=False)
-            data = request.POST
+            new_post: Post = add_form.save(commit=False)
+            data: QueryDict = request.POST
             if data.get('is_secret'):
                 new_post.salt, new_post.secure_body = encoding(data['body'], data['password'])
                 new_post.body = ''
@@ -99,7 +100,7 @@ def post_add(request):
             new_post.save()
         return render(request, 'notes/add_post.html', {'post': new_post, 'added': True})
     else:
-        categories = request.user.notes_categories.all()
+        categories: QuerySet = request.user.notes_categories.all()
         # add_form = AddPostForm()
         # форма прописана в шаблоне. хочу сделать через form.as_p или как-то иначе,
         # но чтобы использовался класс формы
@@ -109,27 +110,27 @@ def post_add(request):
 
 
 @login_required
-def post_delete(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
+def post_delete(request: HttpRequest, post_id: int) -> HttpResponseRedirect:
+    post: Union[Post, Http404] = get_object_or_404(Post, pk=post_id)
     if post.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
-    cat_id = post.rubric.id
+    cat_id: int = post.rubric.id
     post.delete()
     return HttpResponseRedirect(reverse('notes:category', kwargs={'cat_id': cat_id}))
 
 
 @login_required
-def post_edit(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
+def post_edit(request: HttpRequest, post_id: int) -> Union[HttpResponseRedirect, HttpResponse]:
+    post: Union[Post, Http404] = get_object_or_404(Post, pk=post_id)
     if post.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
     if post.is_secret:
         return secret_post_edit(request, post.id)
     else:
         if request.method == 'POST':
-            edit_form = AddPostForm(data=request.POST)
+            edit_form: AddPostForm = AddPostForm(data=request.POST)
             if edit_form.is_valid():
-                data = request.POST
+                data: QueryDict = request.POST
                 post.title = data.get('title')
                 post.body = data.get('body')
                 if data.get('is_secret'):
@@ -140,21 +141,21 @@ def post_edit(request, post_id):
                 post.save()
             return render(request, 'notes/edit_post.html', {'post': post, 'saved': True})
         else:
-            categories = request.user.notes_categories.all()
-            context = {'post': post, 'categories': categories}
+            categories: QuerySet = request.user.notes_categories.all()
+            context: Dict = {'post': post, 'categories': categories}
             return render(request, 'notes/edit_post.html', context)
 
 
 @login_required
-def secret_post_edit(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
+def secret_post_edit(request: HttpRequest, post_id: int) -> Union[HttpResponseRedirect, HttpResponse]:
+    post: Union[Post, Http404] = get_object_or_404(Post, pk=post_id)
     if post.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
     if request.method == 'POST':
-        password = request.POST['password']
-        salt = bytes(post.salt)
-        token = bytes(post.secure_body)
-        text = decoding(salt=salt, password=password, token=token)
+        password: str = request.POST['password']
+        salt: bytes = bytes(post.salt)
+        token: bytes = bytes(post.secure_body)
+        text: str = decoding(salt=salt, password=password, token=token)
         if text == 'Error. Wrong password':
             return render(request, 'notes/edit_secret_post.html', {'post': post, 'error': True})
         post.body = text
@@ -165,13 +166,13 @@ def secret_post_edit(request, post_id):
         return render(request, 'notes/edit_secret_post.html', {'post': post})
 
 
-def alien_post(request):
+def alien_post(request: HttpRequest) -> HttpResponse:
     return render(request, 'notes/alien.html')
 
 
-def register(request):
+def register(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
-        user_form = UserRegistrationForm(request.POST)
+        user_form: UserRegistrationForm = UserRegistrationForm(request.POST)
         if user_form.is_valid():
             new_user = user_form.save(commit=False)
             new_user.set_password(user_form.cleaned_data['password'])
