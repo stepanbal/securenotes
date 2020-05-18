@@ -17,8 +17,8 @@ of the application by different users. In addition, each of them will have their
 
 ### Installing
 
-To install app you have to clone code to your computer and build the docker images. You have to docker and docker-compose
-be installled on your computer. Run next commands:
+To install app you have to clone code to your computer and build the docker images. You need docker and docker-compose
+been installed on your computer. Run next commands:
 ```
 docker-compose build
 docker-compose up -d
