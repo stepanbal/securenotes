@@ -6,6 +6,9 @@ from django.urls import reverse
 from .models import Category, Post
 from .forms import UserRegistrationForm
 
+# мне не нравится, что все тесты в одном файле. Хотел положить все в отдельный пакет и разбить по моделям, формам и вью.
+# но тогда тесты не запускались внутри контейнера. Как исправить это, не нашел пока.
+
 
 class CategoryModelTest(TestCase):
 
@@ -125,4 +128,5 @@ class SecretPostAddPageTest(TestCase):
                                                     'password': 'password'})
         note = Post.objects.get(title='title')
         response = self.client.post('/post/%s/' % note.id, {'password': 'password'})
+
         self.assertEqual(response.context['text'], 'secret text')
