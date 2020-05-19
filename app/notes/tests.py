@@ -83,9 +83,24 @@ class CategoryDetailPageTest(TestCase):
 
     def test_user_try_to_open_alien_category(self):
         self.client.post('/login/', {'username': 'testuser1', 'password': '12345'})
-        response = self.client.get('')
         test_user2 = User.objects.create_user(username='testuser2', password='12345')
         test_user2.save()
         cat = Category.objects.create(name='category', author=test_user2)
         response = self.client.get('/category/%s/' % cat.id)
         self.assertRedirects(response, '/alien/')
+
+
+class SecretPostPageTest(TestCase):
+
+    def setUp(self):
+        test_user = User.objects.create_user(username='testuser', email='email@email.com', password='12345')
+        test_user.save()
+
+    def test_user_try_to_open_secret_note(self):
+        self.client.post('/login/', {'username': 'testuser', 'password': '12345'})
+        response = self.client.get('')
+        cat = Category.objects.create(name='category', author=response.context['user'])
+        note = Post.objects.create(title='title', rubric=cat, author=response.context['user'], is_secret=True)
+        response = self.client.get('/post/%s/' % note.id)
+
+        self.assertTemplateUsed(response, 'notes/secure_post.html')
