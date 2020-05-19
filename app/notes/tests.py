@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from .models import Category, Post
+from .forms import UserRegistrationForm
 
 
 class CategoryModelTest(TestCase):
@@ -29,3 +30,20 @@ class PostModelTest(TestCase):
         post = Post.objects.get(id=1)
         expected_object_name = post.title
         self.assertEquals(expected_object_name, str(post))
+
+
+class UserRegistrationFormTest(TestCase):
+
+    def test_clean_password2_match_passwords(self):
+        password = '12345678'
+        password2 = '12345678'
+        form_data = {'username': 'user', 'password': password, 'password2': password2}
+        form = UserRegistrationForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_clean_password2_mismatch_passwords(self):
+        password = '12345678'
+        password2 = '12345679'
+        form_data = {'username': 'user', 'password': password, 'password2': password2}
+        form = UserRegistrationForm(data=form_data)
+        self.assertFalse(form.is_valid())
