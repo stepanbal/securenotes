@@ -19,7 +19,7 @@ def index(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def category_detail(request: HttpRequest, cat_id: int) -> HttpResponse:
-    category: Union[Category, Http404] = get_object_or_404(Category, pk=cat_id)
+    category: Category = get_object_or_404(Category, pk=cat_id)
     if category.author == request.user:
         context: Dict = {'category': category}
         return render(request, 'notes/category.html', context)
@@ -47,7 +47,7 @@ def category_add(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def category_delete(request: HttpRequest, cat_id: int) -> HttpResponseRedirect:
-    category: Union[Category, Http404] = get_object_or_404(Category, pk=cat_id)
+    category: Category = get_object_or_404(Category, pk=cat_id)
     if category.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
     category.delete()
@@ -56,7 +56,7 @@ def category_delete(request: HttpRequest, cat_id: int) -> HttpResponseRedirect:
 
 @login_required
 def category_rename(request: HttpRequest, cat_id: int) -> Union[HttpResponseRedirect, HttpResponse]:
-    category: Union[Category, Http404] = get_object_or_404(Category, pk=cat_id)
+    category: Category = get_object_or_404(Category, pk=cat_id)
     if category.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
     if request.method == 'POST':
@@ -69,7 +69,7 @@ def category_rename(request: HttpRequest, cat_id: int) -> Union[HttpResponseRedi
 
 @login_required
 def post_detail(request: HttpRequest, post_id: int) -> Union[HttpResponseRedirect, HttpResponse]:
-    post: Union[Post, Http404] = get_object_or_404(Post, pk=post_id)
+    post: Post = get_object_or_404(Post, pk=post_id)
     if post.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
     context: Dict = {'post': post}
@@ -111,7 +111,7 @@ def post_add(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def post_delete(request: HttpRequest, post_id: int) -> HttpResponseRedirect:
-    post: Union[Post, Http404] = get_object_or_404(Post, pk=post_id)
+    post: Post = get_object_or_404(Post, pk=post_id)
     if post.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
     cat_id: int = post.rubric.id
@@ -121,7 +121,7 @@ def post_delete(request: HttpRequest, post_id: int) -> HttpResponseRedirect:
 
 @login_required
 def post_edit(request: HttpRequest, post_id: int) -> Union[HttpResponseRedirect, HttpResponse]:
-    post: Union[Post, Http404] = get_object_or_404(Post, pk=post_id)
+    post: Post = get_object_or_404(Post, pk=post_id)
     if post.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
     if post.is_secret:
@@ -148,7 +148,7 @@ def post_edit(request: HttpRequest, post_id: int) -> Union[HttpResponseRedirect,
 
 @login_required
 def secret_post_edit(request: HttpRequest, post_id: int) -> Union[HttpResponseRedirect, HttpResponse]:
-    post: Union[Post, Http404] = get_object_or_404(Post, pk=post_id)
+    post: Post = get_object_or_404(Post, pk=post_id)
     if post.author != request.user:
         return HttpResponseRedirect(reverse('notes:alien'))
     if request.method == 'POST':
