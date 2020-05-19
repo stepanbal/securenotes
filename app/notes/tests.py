@@ -104,3 +104,25 @@ class SecretPostPageTest(TestCase):
         response = self.client.get('/post/%s/' % note.id)
 
         self.assertTemplateUsed(response, 'notes/secure_post.html')
+
+
+class SecretPostAddPageTest(TestCase):
+
+    def setUp(self):
+        test_user = User.objects.create_user(username='testuser', email='email@email.com', password='12345')
+        test_user.save()
+
+    def test_create_secret_post_and_get_text_back(self):
+        self.client.post('/login/', {'username': 'testuser', 'password': '12345'})
+        response = self.client.get('')
+        cat = Category.objects.create(name='category', author=response.context['user'])
+        self.client.get('notes:post_add')
+        self.client.post(reverse('notes:post_add'), {
+                                                    'title': 'title',
+                                                    'body': 'secret text',
+                                                    'rubric': cat.id,
+                                                    'is_secret': True,
+                                                    'password': 'password'})
+        note = Post.objects.get(title='title')
+        response = self.client.post('/post/%s/' % note.id, {'password': 'password'})
+        self.assertEqual(response.context['text'], 'secret text')
